@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
+
+  <meta name="theme-color" content="#101214" />
+
+  <title>Bar Stock</title>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">PLANTA Queen · Prototype</p>
+        <h1>Bar Stock</h1>
+      </div>
+
+      <button
+        id="todayButton"
+        class="button button--secondary button--small"
+        type="button"
+      >
+        Today
+      </button>
+    </header>
+
+    <section class="panel date-panel">
+      <div class="date-panel__field">
+        <label for="datePicker">Inventory date</label>
+
+        <input
+          id="datePicker"
+          type="date"
+        />
+      </div>
+
+      <div class="progress">
+        <div class="progress__meta">
+          <span id="progressText">0 of 0 counted</span>
+          <span id="progressPercent">0%</span>
+        </div>
+
+        <div
+          class="progress__track"
+          aria-hidden="true"
+        >
+          <div
+            id="progressBar"
+            class="progress__bar"
+          ></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="action-grid">
+      <button
+        id="copyButton"
+        class="button button--primary"
+        type="button"
+      >
+        Copy from previous date
+      </button>
+
+      <button
+        id="resetButton"
+        class="button button--secondary"
+        type="button"
+      >
+        Clear this date
+      </button>
+    </section>
+
+    <section class="panel toolbar">
+      <label class="sr-only" for="searchInput">Search bottles</label>
+
+      <input
+        id="searchInput"
+        type="search"
+        placeholder="Search bottles…"
+        autocomplete="off"
+      />
+
+      <label class="sr-only" for="statusFilter">Filter by status</label>
+
+      <select id="statusFilter">
+        <option value="all">All statuses</option>
+        <option value="very-low">Very Low</option>
+        <option value="low">Low</option>
+        <option value="in-stock">In Stock</option>
+        <option value="uncounted">Not counted</option>
+      </select>
+    </section>
+
+    <main class="main-content">
+      <section
+        id="inventoryView"
+        class="view view--active"
+        aria-label="Inventory"
+      >
+        <div
+          id="bottleList"
+          class="bottle-list"
+        ></div>
+      </section>
+
+      <section
+        id="summaryView"
+        class="view"
+        aria-label="Summary"
+      >
+        <div class="panel section-heading">
+          <div>
+            <p class="eyebrow">Automatic overview</p>
+            <h2>Summary</h2>
+          </div>
+
+          <div
+            id="summaryStats"
+            class="summary-stats"
+          ></div>
+        </div>
+
+        <div
+          id="summaryList"
+          class="summary-list"
+        ></div>
+      </section>
+
+      <section
+        id="historyView"
+        class="view"
+        aria-label="History"
+      >
+        <div class="panel section-heading">
+          <div>
+            <p class="eyebrow">Saved locally on this device</p>
+            <h2>History</h2>
+          </div>
+        </div>
+
+        <div
+          id="historyList"
+          class="history-list"
+        ></div>
+      </section>
+    </main>
+
+    <nav
+      class="bottom-nav"
+      aria-label="Primary navigation"
+    >
+      <button
+        class="nav-button nav-button--active"
+        type="button"
+        data-view="inventoryView"
+      >
+        Inventory
+      </button>
+
+      <button
+        class="nav-button"
+        type="button"
+        data-view="summaryView"
+      >
+        Summary
+      </button>
+
+      <button
+        class="nav-button"
+        type="button"
+        data-view="historyView"
+      >
+        History
+      </button>
+    </nav>
+  </div>
+
+  <dialog id="bottleDialog">
+    <form
+      id="bottleForm"
+      class="modal"
+      method="dialog"
+    >
+      <div class="modal__header">
+        <div
+          id="modalVisual"
+          class="bottle-visual"
+          aria-hidden="true"
+        >
+          GG
+        </div>
+
+        <div class="modal__title">
+          <p
+            id="modalCategory"
+            class="eyebrow"
+          >
+            Vodka
+          </p>
+
+          <h2 id="modalName">Grey Goose</h2>
+
+          <div
+            id="modalStatus"
+            class="status-pill"
+          >
+            VERY LOW
+          </div>
+        </div>
+
+        <button
+          class="icon-button"
+          type="submit"
+          value="cancel"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="location-list">
+        <section class="location-card">
+          <h3>Main Bar</h3>
+
+          <div class="counter">
+            <button
+              class="counter__button counter__button--minus"
+              type="button"
+              data-location="main"
+              aria-label="Decrease Main Bar count"
+            >
+              −
+            </button>
+
+            <input
+              class="counter__input"
+              data-location="main"
+              type="number"
+              inputmode="decimal"
+              step="0.1"
+              min="0"
+              value="0"
+              aria-label="Main Bar count"
+            />
+
+            <button
+              class="counter__button counter__button--plus"
+              type="button"
+              data-location="main"
+              aria-label="Increase Main Bar count"
+            >
+              +
+            </button>
+          </div>
+        </section>
+
+        <section class="location-card">
+          <h3>Dragon Room</h3>
+
+          <div class="counter">
+            <button
+              class="counter__button counter__button--minus"
+              type="button"
+              data-location="dragon"
+              aria-label="Decrease Dragon Room count"
+            >
+              −
+            </button>
+
+            <input
+              class="counter__input"
+              data-location="dragon"
+              type="number"
+              inputmode="decimal"
+              step="0.1"
+              min="0"
+              value="0"
+              aria-label="Dragon Room count"
+            />
+
+            <button
+              class="counter__button counter__button--plus"
+              type="button"
+              data-location="dragon"
+              aria-label="Increase Dragon Room count"
+            >
+              +
+            </button>
+          </div>
+        </section>
+
+        <section class="location-card">
+          <h3>Storage</h3>
+
+          <div class="counter">
+            <button
+              class="counter__button counter__button--minus"
+              type="button"
+              data-location="storage"
+              aria-label="Decrease Storage count"
+            >
+              −
+            </button>
+
+            <input
+              class="counter__input"
+              data-location="storage"
+              type="number"
+              inputmode="decimal"
+              step="0.1"
+              min="0"
+              value="0"
+              aria-label="Storage count"
+            />
+
+            <button
+              class="counter__button counter__button--plus"
+              type="button"
+              data-location="storage"
+              aria-label="Increase Storage count"
+            >
+              +
+            </button>
+          </div>
+        </section>
+      </div>
+
+      <div class="total-card">
+        <span>Total</span>
+        <strong id="modalTotal">0</strong>
+      </div>
+
+      <div class="modal__actions">
+        <button
+          id="saveBottleButton"
+          class="button button--primary button--full"
+          type="button"
+        >
+          Save bottle
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="copyDialog">
+    <form
+      class="modal modal--small"
+      method="dialog"
+    >
+      <div class="modal__header modal__header--compact">
+        <div>
+          <p class="eyebrow">Start faster</p>
+          <h2>Copy inventory</h2>
+        </div>
+
+        <button
+          class="icon-button"
+          type="submit"
+          value="cancel"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <p class="muted">
+        Choose a previous date. Its inventory will be copied into the current
+        date as a new snapshot.
+      </p>
+
+      <label class="sr-only" for="copyDateSelect">Previous date</label>
+
+      <select
+        id="copyDateSelect"
+        class="field-full"
+      ></select>
+
+      <div class="modal__actions modal__actions--split">
+        <button
+          class="button button--secondary"
+          type="submit"
+          value="cancel"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="confirmCopyButton"
+          class="button button--primary"
+          type="button"
+        >
+          Copy
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
