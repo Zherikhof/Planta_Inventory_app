@@ -2,217 +2,434 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+
+  <!--
+    The application is intentionally non-zoomable on mobile.
+    This is a deliberate choice for the inventory workflow:
+    repeated taps on + / - controls should never trigger browser zoom.
+  -->
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
   />
 
-  <meta name="theme-color" content="#101214" />
+  <meta name="theme-color" content="#0f1113" />
 
-  <title>Bar Stock</title>
+  <title>Inventory Hub</title>
 
   <link rel="stylesheet" href="styles.css" />
 </head>
 
 <body>
-  <div class="app">
+  <div class="app-shell">
     <header class="app-header">
-      <div>
-        <p class="eyebrow">PLANTA Queen · Prototype</p>
-        <h1>Bar Stock</h1>
+      <button
+        id="backButton"
+        class="icon-button icon-button--back hidden"
+        type="button"
+        aria-label="Go back"
+      >
+        ←
+      </button>
+
+      <div class="app-header__title">
+        <p class="eyebrow">PLANTA Queen · Inventory</p>
+        <h1 id="pageTitle">Inventory Hub</h1>
       </div>
 
-      <button
-        id="todayButton"
-        class="button button--secondary button--small"
-        type="button"
-      >
-        Today
-      </button>
+      <div class="app-header__actions">
+        <button
+          id="homeButton"
+          class="button button--ghost button--small hidden"
+          type="button"
+        >
+          Home
+        </button>
+      </div>
     </header>
 
-    <section class="panel date-panel">
-      <div class="date-panel__field">
-        <label for="datePicker">Inventory date</label>
-
-        <input
-          id="datePicker"
-          type="date"
-        />
-      </div>
-
-      <div class="progress">
-        <div class="progress__meta">
-          <span id="progressText">0 of 0 counted</span>
-          <span id="progressPercent">0%</span>
-        </div>
-
-        <div
-          class="progress__track"
-          aria-hidden="true"
-        >
-          <div
-            id="progressBar"
-            class="progress__bar"
-          ></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="action-grid">
-      <button
-        id="copyButton"
-        class="button button--primary"
-        type="button"
-      >
-        Copy from previous date
-      </button>
-
-      <button
-        id="resetButton"
-        class="button button--secondary"
-        type="button"
-      >
-        Clear this date
-      </button>
-    </section>
-
-    <section class="panel toolbar">
-      <label class="sr-only" for="searchInput">Search bottles</label>
-
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="Search bottles…"
-        autocomplete="off"
-      />
-
-      <label class="sr-only" for="statusFilter">Filter by status</label>
-
-      <select id="statusFilter">
-        <option value="all">All statuses</option>
-        <option value="very-low">Very Low</option>
-        <option value="low">Low</option>
-        <option value="in-stock">In Stock</option>
-        <option value="uncounted">Not counted</option>
-      </select>
-    </section>
-
-    <main class="main-content">
+    <main>
+      <!-- =========================================================
+           HOME / CRM
+      ========================================================== -->
       <section
-        id="inventoryView"
-        class="view view--active"
-        aria-label="Inventory"
+        id="homePage"
+        class="page page--active"
+        data-page-title="Inventory Hub"
       >
-        <div
-          id="bottleList"
-          class="bottle-list"
-        ></div>
-      </section>
-
-      <section
-        id="summaryView"
-        class="view"
-        aria-label="Summary"
-      >
-        <div class="panel section-heading">
+        <section class="hero panel">
           <div>
-            <p class="eyebrow">Automatic overview</p>
-            <h2>Summary</h2>
+            <p class="eyebrow">Operations dashboard</p>
+            <h2>What are you counting today?</h2>
+            <p class="hero__copy">
+              One place for bar inventory and disposable packaging stock.
+            </p>
           </div>
 
-          <div
-            id="summaryStats"
-            class="summary-stats"
-          ></div>
-        </div>
+          <div class="hero__badge">
+            <span>CRM-style</span>
+            <strong>Inventory</strong>
+          </div>
+        </section>
 
-        <div
-          id="summaryList"
-          class="summary-list"
-        ></div>
+        <section class="module-grid">
+          <button
+            class="module-card"
+            type="button"
+            data-open-module="bar"
+          >
+            <div class="module-card__visual module-card__visual--bar">
+              <span>BAR</span>
+            </div>
+
+            <div class="module-card__content">
+              <p class="eyebrow">Liquor · wine · spirits</p>
+              <h3>Bar Inventory</h3>
+              <p>
+                View the latest stock or begin a new bottle count.
+              </p>
+            </div>
+
+            <span class="module-card__arrow">→</span>
+          </button>
+
+          <button
+            class="module-card"
+            type="button"
+            data-open-module="supplies"
+          >
+            <div class="module-card__visual module-card__visual--supplies">
+              <span>PKG</span>
+            </div>
+
+            <div class="module-card__content">
+              <p class="eyebrow">Cups · lids · boxes · bags</p>
+              <h3>Packaging & To-Go</h3>
+              <p>
+                Track cases and sleeves without counting thousands of pieces.
+              </p>
+            </div>
+
+            <span class="module-card__arrow">→</span>
+          </button>
+        </section>
+
+        <section class="quick-status-grid">
+          <article class="panel quick-status">
+            <span class="quick-status__label">Bar</span>
+            <strong id="homeBarLastCount">No count yet</strong>
+            <span id="homeBarAttention">—</span>
+          </article>
+
+          <article class="panel quick-status">
+            <span class="quick-status__label">Packaging</span>
+            <strong id="homeSupplyLastCount">No count yet</strong>
+            <span id="homeSupplyAttention">—</span>
+          </article>
+        </section>
       </section>
 
+      <!-- =========================================================
+           BAR - CURRENT STOCK
+      ========================================================== -->
       <section
-        id="historyView"
-        class="view"
-        aria-label="History"
+        id="barCurrentPage"
+        class="page"
+        data-page-title="Bar · Current Stock"
       >
-        <div class="panel section-heading">
+        <section class="stock-hero panel">
           <div>
-            <p class="eyebrow">Saved locally on this device</p>
-            <h2>History</h2>
+            <p class="eyebrow">Latest bottle inventory</p>
+            <h2>Current Bar Stock</h2>
+            <p id="barLatestDate" class="muted">
+              No bottle count has been saved yet.
+            </p>
           </div>
-        </div>
 
-        <div
-          id="historyList"
-          class="history-list"
-        ></div>
+          <button
+            id="barEditButton"
+            class="button button--secondary"
+            type="button"
+          >
+            Edit assortment
+          </button>
+        </section>
+
+        <section
+          id="barStats"
+          class="metric-grid"
+        ></section>
+
+        <section class="stock-toolbar panel">
+          <div class="segmented-control">
+            <button
+              class="segmented-control__button segmented-control__button--active"
+              type="button"
+              data-bar-stock-view="overview"
+            >
+              Overview
+            </button>
+
+            <button
+              class="segmented-control__button"
+              type="button"
+              data-bar-stock-view="detail"
+            >
+              Detailed stock
+            </button>
+          </div>
+
+          <button
+            id="addBarItemButton"
+            class="button button--primary hidden"
+            type="button"
+          >
+            + Add liquor
+          </button>
+        </section>
+
+        <section
+          id="barOverview"
+          class="stock-overview"
+        ></section>
+
+        <section
+          id="barDetail"
+          class="inventory-grid hidden"
+        ></section>
+      </section>
+
+      <!-- =========================================================
+           BAR - COUNT
+      ========================================================== -->
+      <section
+        id="barCountPage"
+        class="page"
+        data-page-title="Bar · Bottle Count"
+      >
+        <section class="count-header panel">
+          <div class="count-header__date">
+            <label for="barCountDate">Inventory date</label>
+            <input id="barCountDate" type="date" />
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-block__meta">
+              <span id="barProgressText">0 of 0 counted</span>
+              <span id="barProgressPercent">0%</span>
+            </div>
+
+            <div class="progress-track">
+              <div
+                id="barProgressBar"
+                class="progress-bar"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="action-grid">
+          <button
+            id="barCopyButton"
+            class="button button--primary"
+            type="button"
+          >
+            Copy previous date
+          </button>
+
+          <button
+            id="barClearButton"
+            class="button button--secondary"
+            type="button"
+          >
+            Clear this date
+          </button>
+        </section>
+
+        <section class="filter-bar panel">
+          <input
+            id="barSearchInput"
+            type="search"
+            placeholder="Search liquor…"
+            autocomplete="off"
+          />
+
+          <select id="barStatusFilter">
+            <option value="all">All statuses</option>
+            <option value="very-low">Very Low</option>
+            <option value="low">Low</option>
+            <option value="in-stock">In Stock</option>
+            <option value="uncounted">Not counted</option>
+          </select>
+        </section>
+
+        <section
+          id="barCountList"
+          class="inventory-grid"
+        ></section>
+      </section>
+
+      <!-- =========================================================
+           PACKAGING - CURRENT STOCK
+      ========================================================== -->
+      <section
+        id="supplyCurrentPage"
+        class="page"
+        data-page-title="Packaging · Current Stock"
+      >
+        <section class="stock-hero panel">
+          <div>
+            <p class="eyebrow">Cases · sleeves · active stock</p>
+            <h2>Packaging & To-Go</h2>
+            <p id="supplyLatestDate" class="muted">
+              No packaging count has been saved yet.
+            </p>
+          </div>
+
+          <button
+            id="supplyEditButton"
+            class="button button--secondary"
+            type="button"
+          >
+            Edit assortment
+          </button>
+        </section>
+
+        <section
+          id="supplyStats"
+          class="metric-grid"
+        ></section>
+
+        <section class="stock-toolbar panel">
+          <div class="segmented-control">
+            <button
+              class="segmented-control__button segmented-control__button--active"
+              type="button"
+              data-supply-stock-view="overview"
+            >
+              Overview
+            </button>
+
+            <button
+              class="segmented-control__button"
+              type="button"
+              data-supply-stock-view="detail"
+            >
+              Detailed stock
+            </button>
+          </div>
+
+          <button
+            id="addSupplyItemButton"
+            class="button button--primary hidden"
+            type="button"
+          >
+            + Add item
+          </button>
+        </section>
+
+        <section
+          id="supplyOverview"
+          class="stock-overview"
+        ></section>
+
+        <section
+          id="supplyDetail"
+          class="inventory-grid hidden"
+        ></section>
+      </section>
+
+      <!-- =========================================================
+           PACKAGING - COUNT
+      ========================================================== -->
+      <section
+        id="supplyCountPage"
+        class="page"
+        data-page-title="Packaging · Count"
+      >
+        <section class="count-header panel">
+          <div class="count-header__date">
+            <label for="supplyCountDate">Inventory date</label>
+            <input id="supplyCountDate" type="date" />
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-block__meta">
+              <span id="supplyProgressText">0 of 0 counted</span>
+              <span id="supplyProgressPercent">0%</span>
+            </div>
+
+            <div class="progress-track">
+              <div
+                id="supplyProgressBar"
+                class="progress-bar"
+              ></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="action-grid">
+          <button
+            id="supplyCopyButton"
+            class="button button--primary"
+            type="button"
+          >
+            Copy previous date
+          </button>
+
+          <button
+            id="supplyClearButton"
+            class="button button--secondary"
+            type="button"
+          >
+            Clear this date
+          </button>
+        </section>
+
+        <section class="filter-bar panel">
+          <input
+            id="supplySearchInput"
+            type="search"
+            placeholder="Search packaging…"
+            autocomplete="off"
+          />
+
+          <select id="supplyStatusFilter">
+            <option value="all">All statuses</option>
+            <option value="critical">Critical</option>
+            <option value="low">Low</option>
+            <option value="in-stock">In Stock</option>
+            <option value="overstock">Overstock</option>
+            <option value="uncounted">Not counted</option>
+          </select>
+        </section>
+
+        <section
+          id="supplyCountList"
+          class="inventory-grid"
+        ></section>
       </section>
     </main>
-
-    <nav
-      class="bottom-nav"
-      aria-label="Primary navigation"
-    >
-      <button
-        class="nav-button nav-button--active"
-        type="button"
-        data-view="inventoryView"
-      >
-        Inventory
-      </button>
-
-      <button
-        class="nav-button"
-        type="button"
-        data-view="summaryView"
-      >
-        Summary
-      </button>
-
-      <button
-        class="nav-button"
-        type="button"
-        data-view="historyView"
-      >
-        History
-      </button>
-    </nav>
   </div>
 
-  <dialog id="bottleDialog">
+  <!-- =============================================================
+       MODULE CHOICE MODAL
+  ============================================================== -->
+  <dialog id="moduleDialog">
     <form
-      id="bottleForm"
-      class="modal"
+      class="modal modal--menu"
       method="dialog"
     >
-      <div class="modal__header">
-        <div
-          id="modalVisual"
-          class="bottle-visual"
-          aria-hidden="true"
-        >
-          GG
-        </div>
-
-        <div class="modal__title">
+      <div class="modal__header modal__header--compact">
+        <div>
           <p
-            id="modalCategory"
+            id="moduleDialogEyebrow"
             class="eyebrow"
           >
-            Vodka
+            Inventory
           </p>
 
-          <h2 id="modalName">Grey Goose</h2>
-
-          <div
-            id="modalStatus"
-            class="status-pill"
-          >
-            VERY LOW
-          </div>
+          <h2 id="moduleDialogTitle">Bar Inventory</h2>
         </div>
 
         <button
@@ -225,131 +442,321 @@
         </button>
       </div>
 
-      <div class="location-list">
-        <section class="location-card">
-          <h3>Main Bar</h3>
-
-          <div class="counter">
-            <button
-              class="counter__button counter__button--minus"
-              type="button"
-              data-location="main"
-              aria-label="Decrease Main Bar count"
-            >
-              −
-            </button>
-
-            <input
-              class="counter__input"
-              data-location="main"
-              type="number"
-              inputmode="decimal"
-              step="0.1"
-              min="0"
-              value="0"
-              aria-label="Main Bar count"
-            />
-
-            <button
-              class="counter__button counter__button--plus"
-              type="button"
-              data-location="main"
-              aria-label="Increase Main Bar count"
-            >
-              +
-            </button>
-          </div>
-        </section>
-
-        <section class="location-card">
-          <h3>Dragon Room</h3>
-
-          <div class="counter">
-            <button
-              class="counter__button counter__button--minus"
-              type="button"
-              data-location="dragon"
-              aria-label="Decrease Dragon Room count"
-            >
-              −
-            </button>
-
-            <input
-              class="counter__input"
-              data-location="dragon"
-              type="number"
-              inputmode="decimal"
-              step="0.1"
-              min="0"
-              value="0"
-              aria-label="Dragon Room count"
-            />
-
-            <button
-              class="counter__button counter__button--plus"
-              type="button"
-              data-location="dragon"
-              aria-label="Increase Dragon Room count"
-            >
-              +
-            </button>
-          </div>
-        </section>
-
-        <section class="location-card">
-          <h3>Storage</h3>
-
-          <div class="counter">
-            <button
-              class="counter__button counter__button--minus"
-              type="button"
-              data-location="storage"
-              aria-label="Decrease Storage count"
-            >
-              −
-            </button>
-
-            <input
-              class="counter__input"
-              data-location="storage"
-              type="number"
-              inputmode="decimal"
-              step="0.1"
-              min="0"
-              value="0"
-              aria-label="Storage count"
-            />
-
-            <button
-              class="counter__button counter__button--plus"
-              type="button"
-              data-location="storage"
-              aria-label="Increase Storage count"
-            >
-              +
-            </button>
-          </div>
-        </section>
-      </div>
-
-      <div class="total-card">
-        <span>Total</span>
-        <strong id="modalTotal">0</strong>
-      </div>
-
-      <div class="modal__actions">
+      <div class="modal-menu">
         <button
-          id="saveBottleButton"
-          class="button button--primary button--full"
+          id="moduleCurrentButton"
+          class="modal-menu__option"
           type="button"
         >
-          Save bottle
+          <span class="modal-menu__icon">◉</span>
+
+          <span>
+            <strong>View current stock</strong>
+            <small>Open the latest completed inventory.</small>
+          </span>
+
+          <span>→</span>
+        </button>
+
+        <button
+          id="moduleCountButton"
+          class="modal-menu__option"
+          type="button"
+        >
+          <span class="modal-menu__icon">＋</span>
+
+          <span>
+            <strong id="moduleCountLabel">Start bottle count</strong>
+            <small>Create or continue an inventory for a date.</small>
+          </span>
+
+          <span>→</span>
         </button>
       </div>
     </form>
   </dialog>
 
-  <dialog id="copyDialog">
+  <!-- =============================================================
+       BAR COUNT MODAL
+  ============================================================== -->
+  <dialog id="barCountDialog">
+    <form
+      class="modal"
+      method="dialog"
+    >
+      <div class="modal__header">
+        <img
+          id="barModalImage"
+          class="modal-product-image"
+          alt=""
+        />
+
+        <div class="modal__title">
+          <p
+            id="barModalCategory"
+            class="eyebrow"
+          ></p>
+
+          <h2 id="barModalName"></h2>
+
+          <div
+            id="barModalStatus"
+            class="status-pill"
+          ></div>
+        </div>
+
+        <button
+          class="icon-button"
+          type="submit"
+          value="cancel"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div id="barLocationList" class="location-list"></div>
+
+      <div class="total-card">
+        <span>Total bottles</span>
+        <strong id="barModalTotal">0</strong>
+      </div>
+
+      <button
+        id="saveBarCountButton"
+        class="button button--primary button--full"
+        type="button"
+      >
+        Save bottle
+      </button>
+    </form>
+  </dialog>
+
+  <!-- =============================================================
+       SUPPLY COUNT MODAL
+  ============================================================== -->
+  <dialog id="supplyCountDialog">
+    <form
+      class="modal"
+      method="dialog"
+    >
+      <div class="modal__header">
+        <img
+          id="supplyModalImage"
+          class="modal-product-image"
+          alt=""
+        />
+
+        <div class="modal__title">
+          <p
+            id="supplyModalCategory"
+            class="eyebrow"
+          ></p>
+
+          <h2 id="supplyModalName"></h2>
+
+          <div
+            id="supplyModalStatus"
+            class="status-pill"
+          ></div>
+        </div>
+
+        <button
+          class="icon-button"
+          type="submit"
+          value="cancel"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="supply-counter-grid">
+        <section class="location-card">
+          <h3>Full cases</h3>
+
+          <div class="simple-counter">
+            <button
+              id="supplyCasesMinus"
+              class="counter-step"
+              type="button"
+            >
+              −
+            </button>
+
+            <input
+              id="supplyCasesInput"
+              class="counter-main-input"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              step="1"
+              value="0"
+            />
+
+            <button
+              id="supplyCasesPlus"
+              class="counter-step"
+              type="button"
+            >
+              +
+            </button>
+          </div>
+        </section>
+
+        <section class="location-card">
+          <h3>Loose sleeves</h3>
+
+          <div class="simple-counter">
+            <button
+              id="supplySleevesMinus"
+              class="counter-step"
+              type="button"
+            >
+              −
+            </button>
+
+            <input
+              id="supplySleevesInput"
+              class="counter-main-input"
+              type="number"
+              inputmode="numeric"
+              min="0"
+              step="1"
+              value="0"
+            />
+
+            <button
+              id="supplySleevesPlus"
+              class="counter-step"
+              type="button"
+            >
+              +
+            </button>
+          </div>
+
+          <p
+            id="supplySleevesHelp"
+            class="field-help"
+          ></p>
+        </section>
+      </div>
+
+      <div class="total-card">
+        <span>Equivalent full cases</span>
+        <strong id="supplyModalTotal">0</strong>
+      </div>
+
+      <button
+        id="saveSupplyCountButton"
+        class="button button--primary button--full"
+        type="button"
+      >
+        Save item
+      </button>
+    </form>
+  </dialog>
+
+  <!-- =============================================================
+       ADD / EDIT ITEM MODAL
+  ============================================================== -->
+  <dialog id="itemEditorDialog">
+    <form
+      class="modal modal--editor"
+      method="dialog"
+    >
+      <div class="modal__header modal__header--compact">
+        <div>
+          <p
+            id="editorEyebrow"
+            class="eyebrow"
+          >
+            Inventory item
+          </p>
+
+          <h2 id="editorTitle">Add item</h2>
+        </div>
+
+        <button
+          class="icon-button"
+          type="submit"
+          value="cancel"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="form-grid">
+        <label>
+          <span>Name</span>
+          <input
+            id="editorName"
+            type="text"
+            placeholder="Item name"
+          />
+        </label>
+
+        <label>
+          <span>Category</span>
+          <input
+            id="editorCategory"
+            type="text"
+            placeholder="Category"
+          />
+        </label>
+
+        <label class="form-grid__wide">
+          <span>Photo</span>
+          <input
+            id="editorImage"
+            type="file"
+            accept="image/*"
+          />
+          <small>
+            A compressed copy is stored locally in this browser.
+          </small>
+        </label>
+
+        <label
+          id="editorSleevesField"
+          class="hidden"
+        >
+          <span>Sleeves per case</span>
+          <input
+            id="editorSleevesPerCase"
+            type="number"
+            min="1"
+            step="1"
+            value="6"
+          />
+        </label>
+      </div>
+
+      <div class="modal__actions modal__actions--split">
+        <button
+          class="button button--secondary"
+          type="submit"
+          value="cancel"
+        >
+          Cancel
+        </button>
+
+        <button
+          id="saveEditorButton"
+          class="button button--primary"
+          type="button"
+        >
+          Save
+        </button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- =============================================================
+       COPY DATE MODAL
+  ============================================================== -->
+  <dialog id="copyDateDialog">
     <form
       class="modal modal--small"
       method="dialog"
@@ -371,16 +778,11 @@
       </div>
 
       <p class="muted">
-        Choose a previous date. Its inventory will be copied into the current
-        date as a new snapshot.
+        Choose an earlier date. The selected inventory will be copied into the
+        current date as a new snapshot.
       </p>
 
-      <label class="sr-only" for="copyDateSelect">Previous date</label>
-
-      <select
-        id="copyDateSelect"
-        class="field-full"
-      ></select>
+      <select id="copyDateSelect"></select>
 
       <div class="modal__actions modal__actions--split">
         <button
@@ -392,7 +794,7 @@
         </button>
 
         <button
-          id="confirmCopyButton"
+          id="confirmCopyDateButton"
           class="button button--primary"
           type="button"
         >
